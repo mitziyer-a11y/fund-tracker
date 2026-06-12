@@ -68,7 +68,7 @@ export default function RequestForm({ profile, onSubmitted }) {
         text: `Auto-declined — ${data.reviewer_comment?.replace(/\[|\]/g, '') ?? 'amount exceeds remaining balance.'}`,
       })
     } else {
-      setMessage({ type: 'success', text: 'Request submitted. The approver has been notified.' })
+      setMessage({ type: 'success', text: 'Request submitted.' })
       setAmount('')
       setDetails('')
     }
