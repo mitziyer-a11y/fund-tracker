@@ -118,7 +118,7 @@ export default function RequestForm({ profile, onSubmitted }) {
             <select
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
-              className="border border-paperLine rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-ink"
+              className="border border-paperLine rounded px-3 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-ink"
             >
               {CURRENCIES.map((c) => (
                 <option key={c} value={c}>{c}</option>
@@ -140,7 +140,7 @@ export default function RequestForm({ profile, onSubmitted }) {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full border border-paperLine rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-ink"
+            className="w-full border border-paperLine rounded px-3 py-2 bg-card focus:outline-none focus:ring-2 focus:ring-ink"
           >
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>{c}</option>
