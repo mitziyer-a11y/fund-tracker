@@ -38,7 +38,7 @@ export default function AdminPanel({ onUpdated }) {
 
   return (
     <div className="ledger-card p-6 max-w-md">
-      <h2 className="font-display text-2xl mb-1">Admin: fund amount</h2>
+      <h2 className="font-display text-2xl mb-1">Admin: fund amount (SGD)</h2>
       <p className="text-sm text-inkSoft mb-4">
         Update the total exploratory fund (e.g. when new funds are allocated).
         This is the only way the total changes — all other figures are derived
@@ -46,7 +46,7 @@ export default function AdminPanel({ onUpdated }) {
       </p>
       {current && (
         <p className="text-sm mb-3">
-          Current total: <span className="font-mono">${Number(current.total_fund).toLocaleString()}</span>
+          Current total: <span className="font-mono">SGD {Number(current.total_fund).toLocaleString()}</span>
           {current.updated_at && (
             <span className="text-inkSoft"> (last updated {new Date(current.updated_at).toLocaleString()})</span>
           )}
