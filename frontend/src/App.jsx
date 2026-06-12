@@ -7,6 +7,7 @@ import ReviewPanel from './components/ReviewPanel'
 import Utilization from './components/Utilization'
 import AdminPanel from './components/AdminPanel'
 import PeoplePanel from './components/PeoplePanel'
+import ThemeSwitcher from './components/ThemeSwitcher'
 
 const ROLE_LABELS = {
   requester: 'Requester',
@@ -42,6 +43,7 @@ export default function App() {
           .single()
         if (data) {
           setProfile(data)
+          document.documentElement.setAttribute('data-theme', data.theme ?? 'default')
           return
         }
         await new Promise((r) => setTimeout(r, 500))
@@ -111,6 +113,10 @@ export default function App() {
             <h1 className="font-display text-2xl">Ledger &amp; Requests</h1>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeSwitcher
+              profile={profile}
+              onChange={(theme) => setProfile((p) => ({ ...p, theme }))}
+            />
             {profile.avatar_url && (
               <img
                 src={profile.avatar_url}
