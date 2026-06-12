@@ -147,7 +147,7 @@ export default function RequestsList({ profile, isReviewer, refreshKey }) {
                       <select
                         value={editCurrency}
                         onChange={(e) => setEditCurrency(e.target.value)}
-                        className="border border-paperLine rounded px-3 py-2 bg-white"
+                        className="border border-paperLine rounded px-3 py-2 bg-card"
                       >
                         {CURRENCIES.map((c) => (
                           <option key={c} value={c}>{c}</option>
@@ -160,7 +160,7 @@ export default function RequestsList({ profile, isReviewer, refreshKey }) {
                     <select
                       value={editCategory}
                       onChange={(e) => setEditCategory(e.target.value)}
-                      className="w-full border border-paperLine rounded px-3 py-2 bg-white"
+                      className="w-full border border-paperLine rounded px-3 py-2 bg-card"
                     >
                       {CATEGORIES.map((c) => (
                         <option key={c} value={c}>{c}</option>
