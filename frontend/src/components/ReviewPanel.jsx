@@ -14,7 +14,7 @@ export default function ReviewPanel({ profile, refreshKey, onActed }) {
     setLoading(true)
     const { data, error } = await supabase
       .from('requests')
-      .select('*, profiles(full_name, email)')
+      .select('*, profiles!requests_user_id_fkey(full_name, email)')
       .in('status', ['pending', 'needs_revision'])
       .order('created_at', { ascending: true })
     if (error) setError(error.message)
@@ -70,7 +70,7 @@ export default function ReviewPanel({ profile, refreshKey, onActed }) {
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <p className="font-mono text-lg font-semibold">
-                  ${Number(r.amount).toLocaleString()}
+                  {r.currency ?? 'SGD'} {Number(r.amount).toLocaleString()}
                 </p>
                 <p className="text-sm text-inkSoft">
                   {r.category} · from{' '}
@@ -131,7 +131,7 @@ export default function ReviewPanel({ profile, refreshKey, onActed }) {
             {awaitingRequester.map((r) => (
               <div key={r.id} className="ledger-card p-3 opacity-70">
                 <p className="text-sm">
-                  <span className="font-mono">${Number(r.amount).toLocaleString()}</span> ·{' '}
+                  <span className="font-mono">{r.currency ?? 'SGD'} {Number(r.amount).toLocaleString()}</span> ·{' '}
                   {r.category} · {r.profiles?.full_name ?? r.profiles?.email} —{' '}
                   <span className="italic">{r.reviewer_comment}</span>
                 </p>
