@@ -18,6 +18,7 @@ const ROLE_LABELS = {
 export default function App() {
   const [session, setSession] = useState(undefined) // undefined = loading
   const [profile, setProfile] = useState(null)
+  const [profileLoadFailed, setProfileLoadFailed] = useState(false)
   const [tab, setTab] = useState('request')
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -35,6 +36,7 @@ export default function App() {
       return
     }
     const loadProfile = async () => {
+      setProfileLoadFailed(false)
       for (let i = 0; i < 5; i++) {
         const { data } = await supabase
           .from('profiles')
@@ -48,6 +50,7 @@ export default function App() {
         }
         await new Promise((r) => setTimeout(r, 500))
       }
+      setProfileLoadFailed(true)
     }
     loadProfile()
   }, [session])
@@ -59,6 +62,26 @@ export default function App() {
   if (!session) return <Login />
 
   if (!profile) {
+    if (profileLoadFailed) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-paper px-4">
+          <div className="ledger-card max-w-sm w-full p-8 text-center">
+            <p className="text-xs uppercase tracking-widest text-inkSoft mb-2">Exploratory Fund</p>
+            <h1 className="font-display text-2xl mb-4">Couldn't set up your account</h1>
+            <p className="text-sm text-inkSoft mb-6">
+              Something went wrong creating your account. Please try signing
+              in again, or contact an admin if this keeps happening.
+            </p>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="text-sm underline text-inkSoft hover:text-ink"
+            >
+              Sign out and try again
+            </button>
+          </div>
+        </div>
+      )
+    }
     return (
       <div className="min-h-screen flex items-center justify-center bg-paper">
         Setting up your account…
@@ -77,7 +100,7 @@ export default function App() {
           <p className="text-sm text-inkSoft mb-6">
             {profile.status === 'disabled'
               ? 'An admin has disabled access for your account. Contact an admin if you think this is a mistake.'
-              : `Signed in as ${profile.email}. An admin needs to approve your access before you can use the fund tracker.`}
+              : `Signed in as ${profile.email}. Your access request has been routed to an admin — please wait for them to approve it.`}
           </p>
           <button
             onClick={() => supabase.auth.signOut()}
