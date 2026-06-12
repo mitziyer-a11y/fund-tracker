@@ -59,9 +59,16 @@ export default function PeoplePanel({ currentProfileId }) {
     await load()
   }
 
-  const updateProfile = async (id, fields) => {
+  const updateProfile = async (id, fields, email) => {
     setBusy(id)
     const { error } = await supabase.from('profiles').update(fields).eq('id', id)
+    if (!error && fields.role && email) {
+      // Keep the allowlist's role in sync so it always reflects current role,
+      // not a stale snapshot from signup time.
+      await supabase
+        .from('allowed_emails')
+        .upsert({ email: email.toLowerCase(), role: fields.role }, { onConflict: 'email' })
+    }
     setBusy(null)
     if (error) setError(error.message)
     await load()
@@ -171,7 +178,7 @@ export default function PeoplePanel({ currentProfileId }) {
                         <select
                           value={p.role}
                           disabled={busy === p.id || p.id === currentProfileId}
-                          onChange={(e) => updateProfile(p.id, { role: e.target.value })}
+                          onChange={(e) => updateProfile(p.id, { role: e.target.value }, p.email)}
                           className="border border-paperLine rounded px-2 py-1 bg-white text-xs"
                           title={p.id === currentProfileId ? "You can't change your own role" : undefined}
                         >
