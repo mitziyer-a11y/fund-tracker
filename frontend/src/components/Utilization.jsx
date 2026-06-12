@@ -17,7 +17,7 @@ export default function Utilization({ refreshKey }) {
       setLoading(true)
       const [{ data: s }, { data: r }] = await Promise.all([
         supabase.from('fund_summary').select('*').single(),
-        supabase.from('requests').select('*, profiles(full_name, email)'),
+        supabase.from('requests').select('*, profiles!requests_user_id_fkey(full_name, email)'),
       ])
       setSummary(s)
       setRequests(r ?? [])
@@ -122,7 +122,12 @@ export default function Utilization({ refreshKey }) {
       {/* $ spend by category */}
       <div className="ledger-card p-6">
         <h2 className="font-display text-2xl mb-1">Where the money goes</h2>
-        <p className="text-sm text-inkSoft mb-4">Approved spend by category (USD)</p>
+        <p className="text-sm text-inkSoft mb-4">
+          Approved spend by category. Figures are summed as raw numbers
+          regardless of each request's currency — fine if everyone mostly
+          uses SGD, but treat totals as approximate if requests use mixed
+          currencies.
+        </p>
         {spendCategoryData.length === 0 ? (
           <p className="text-sm text-inkSoft">No approved spend yet.</p>
         ) : (
@@ -131,7 +136,7 @@ export default function Utilization({ refreshKey }) {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" />
               <YAxis type="category" dataKey="name" width={130} />
-              <Tooltip formatter={(v) => `$${v.toLocaleString()}`} />
+              <Tooltip formatter={(v) => `SGD ${v.toLocaleString()}`} />
               <Bar dataKey="value" fill="#2F6F4F" radius={[0, 3, 3, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -141,7 +146,7 @@ export default function Utilization({ refreshKey }) {
       {/* $ spend by user */}
       <div className="ledger-card p-6">
         <h2 className="font-display text-2xl mb-1">Fund usage by person</h2>
-        <p className="text-sm text-inkSoft mb-4">Approved spend per requester (USD)</p>
+        <p className="text-sm text-inkSoft mb-4">Approved spend per requester (summed as raw numbers, see note above)</p>
         {spendUserData.length === 0 ? (
           <p className="text-sm text-inkSoft">No approved spend yet.</p>
         ) : (
@@ -150,7 +155,7 @@ export default function Utilization({ refreshKey }) {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" />
               <YAxis type="category" dataKey="name" width={150} />
-              <Tooltip formatter={(v) => `$${v.toLocaleString()}`} />
+              <Tooltip formatter={(v) => `SGD ${v.toLocaleString()}`} />
               <Bar dataKey="value" fill="#3E6FA8" radius={[0, 3, 3, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -165,7 +170,7 @@ function Stat({ label, value, color = 'text-ink', emphasize = false }) {
     <div>
       <p className="text-xs uppercase tracking-wide text-inkSoft">{label}</p>
       <p className={`font-mono ${emphasize ? 'text-2xl' : 'text-xl'} font-semibold ${color}`}>
-        ${Number(value).toLocaleString()}
+        SGD {Number(value).toLocaleString()}
       </p>
     </div>
   )
