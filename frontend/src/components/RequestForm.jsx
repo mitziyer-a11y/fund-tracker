@@ -10,9 +10,12 @@ const CATEGORIES = [
   'Other',
 ]
 
+const CURRENCIES = ['SGD', 'USD', 'EUR', 'GBP', 'AUD', 'JPY', 'INR', 'MYR', 'HKD', 'CNY']
+
 export default function RequestForm({ profile, onSubmitted }) {
   const [summary, setSummary] = useState(null)
   const [amount, setAmount] = useState('')
+  const [currency, setCurrency] = useState('SGD')
   const [category, setCategory] = useState(CATEGORIES[0])
   const [details, setDetails] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -45,6 +48,7 @@ export default function RequestForm({ profile, onSubmitted }) {
       .insert({
         user_id: profile.id,
         amount: Number(amount),
+        currency,
         category,
         details: details.trim(),
       })
@@ -81,11 +85,11 @@ export default function RequestForm({ profile, onSubmitted }) {
           <>
             Remaining balance:{' '}
             <span className="font-mono font-semibold text-ink">
-              ${Number(summary.remaining).toLocaleString()}
+              SGD {Number(summary.remaining).toLocaleString()}
             </span>{' '}
             <span className="text-xs">
-              (of ${Number(summary.total_fund).toLocaleString()} total — $
-              {Number(summary.approved_total).toLocaleString()} approved, $
+              (of SGD {Number(summary.total_fund).toLocaleString()} total — SGD
+              {' '}{Number(summary.approved_total).toLocaleString()} approved, SGD{' '}
               {Number(summary.pending_total).toLocaleString()} pending)
             </span>
           </>
@@ -95,25 +99,41 @@ export default function RequestForm({ profile, onSubmitted }) {
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Amount (USD)</label>
-          <input
-            type="number"
-            min="0.01"
-            step="0.01"
-            required
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full border border-paperLine rounded px-3 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-ink"
-            placeholder="0.00"
-          />
-          {overBudget && (
-            <p className="text-xs text-stampRed mt-1">
-              This exceeds the remaining balance (${remaining.toLocaleString()}) and will be
-              automatically declined — you can submit anyway and revise afterwards.
-            </p>
-          )}
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">Amount</label>
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              required
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full border border-paperLine rounded px-3 py-2 font-mono focus:outline-none focus:ring-2 focus:ring-ink"
+              placeholder="0.00"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Currency</label>
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              className="border border-paperLine rounded px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-ink"
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
         </div>
+        {overBudget && (
+          <p className="text-xs text-stampRed -mt-2">
+            This exceeds the remaining SGD balance (SGD {remaining.toLocaleString()}) and will be
+            automatically declined if the amounts don't match currencies — you can submit anyway and
+            revise afterwards. Note: the fund balance is tracked in SGD; amounts in other currencies
+            are compared by number only, so convert to SGD first for an accurate check.
+          </p>
+        )}
 
         <div>
           <label className="block text-sm font-medium mb-1">Category</label>
