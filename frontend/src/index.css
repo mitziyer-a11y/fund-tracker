@@ -89,3 +89,14 @@ body {
 .tab-btn[aria-selected="true"] {
   border-bottom: 2px solid var(--color-ink);
 }
+
+/* Ensure form fields use theme colors, not browser defaults
+   (white bg + light theme text = unreadable in dark themes) */
+input, textarea, select {
+  background-color: var(--color-card);
+  color: var(--color-ink);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--color-inkSoft);
+}
