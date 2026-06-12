@@ -2,20 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===========================
+   Theme palettes via CSS vars
+   =========================== */
+:root,
+[data-theme="default"] {
+  --color-paper: #F7F2E7;
+  --color-paperLine: #E2D8C3;
+  --color-ink: #1F2A3C;
+  --color-inkSoft: #4B5768;
+  --color-card: #FFFDF8;
+  --color-stamp-green: #2F6F4F;
+  --color-stamp-amber: #C98A2B;
+  --color-stamp-red: #B33A3A;
+  --color-stamp-revision: #8A5FB0;
+}
+
+[data-theme="green"] {
+  --color-paper: #14241C;
+  --color-paperLine: #2E4536;
+  --color-ink: #E8F0EA;
+  --color-inkSoft: #9FC0AC;
+  --color-card: #1B3326;
+  --color-stamp-green: #5CC68A;
+  --color-stamp-amber: #E0B158;
+  --color-stamp-red: #E07A6E;
+  --color-stamp-revision: #C9A6F2;
+}
+
+[data-theme="rose"] {
+  --color-paper: #FFF1F3;
+  --color-paperLine: #F3D6DC;
+  --color-ink: #4A2530;
+  --color-inkSoft: #9A6E78;
+  --color-card: #FFFAFB;
+  --color-stamp-green: #3F8F6B;
+  --color-stamp-amber: #C98A2B;
+  --color-stamp-red: #C9657A;
+  --color-stamp-revision: #A872B0;
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  color: #1F2A3C;
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .ledger-card {
-  background: #FFFDF8;
-  border: 1px solid #E2D8C3;
+  background: var(--color-card);
+  border: 1px solid var(--color-paperLine);
   border-radius: 2px;
-  box-shadow: 0 1px 0 #E2D8C3;
+  box-shadow: 0 1px 0 var(--color-paperLine);
 }
 
 .ledger-rule {
-  border-bottom: 1px solid #E2D8C3;
+  border-bottom: 1px solid var(--color-paperLine);
 }
 
 /* Rubber-stamp style status badges */
@@ -34,10 +76,10 @@ body {
   transform: rotate(-2deg);
 }
 
-.stamp-pending { color: #C98A2B; }
-.stamp-approved { color: #2F6F4F; }
-.stamp-declined { color: #B33A3A; }
-.stamp-revision { color: #8A5FB0; }
+.stamp-pending { color: var(--color-stamp-amber); }
+.stamp-approved { color: var(--color-stamp-green); }
+.stamp-declined { color: var(--color-stamp-red); }
+.stamp-revision { color: var(--color-stamp-revision); }
 
 .tab-btn {
   font-family: 'Source Serif 4', serif;
@@ -45,5 +87,5 @@ body {
 }
 
 .tab-btn[aria-selected="true"] {
-  border-bottom: 2px solid #1F2A3C;
+  border-bottom: 2px solid var(--color-ink);
 }
