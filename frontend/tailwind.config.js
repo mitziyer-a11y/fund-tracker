@@ -4,13 +4,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: '#F7F2E7',
-        paperLine: '#E2D8C3',
-        ink: '#1F2A3C',
-        inkSoft: '#4B5768',
-        stampGreen: '#2F6F4F',
-        stampRed: '#B33A3A',
-        stampAmber: '#C98A2B',
+        paper: 'var(--color-paper)',
+        paperLine: 'var(--color-paperLine)',
+        ink: 'var(--color-ink)',
+        inkSoft: 'var(--color-inkSoft)',
+        card: 'var(--color-card)',
+        stampGreen: 'var(--color-stamp-green)',
+        stampAmber: 'var(--color-stamp-amber)',
+        stampRed: 'var(--color-stamp-red)',
+        stampRevision: 'var(--color-stamp-revision)',
       },
       fontFamily: {
         display: ['"Source Serif 4"', 'Georgia', 'serif'],
