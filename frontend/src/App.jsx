@@ -8,6 +8,12 @@ import Utilization from './components/Utilization'
 import AdminPanel from './components/AdminPanel'
 import PeoplePanel from './components/PeoplePanel'
 
+const ROLE_LABELS = {
+  requester: 'Requester',
+  approver: 'Approver',
+  admin: 'Admin',
+}
+
 export default function App() {
   const [session, setSession] = useState(undefined) // undefined = loading
   const [profile, setProfile] = useState(null)
@@ -28,8 +34,6 @@ export default function App() {
       return
     }
     const loadProfile = async () => {
-      // Profile row is created by a DB trigger on first sign-in; retry briefly
-      // in case there's a race on very first login.
       for (let i = 0; i < 5; i++) {
         const { data } = await supabase
           .from('profiles')
@@ -106,14 +110,26 @@ export default function App() {
             <p className="text-xs uppercase tracking-widest text-inkSoft">Exploratory Fund</p>
             <h1 className="font-display text-2xl">Ledger &amp; Requests</h1>
           </div>
-          <div className="text-right text-sm">
-            <p>{profile.full_name ?? profile.email}</p>
-            <button
-              onClick={() => supabase.auth.signOut()}
-              className="text-xs underline text-inkSoft hover:text-ink"
-            >
-              Sign out
-            </button>
+          <div className="flex items-center gap-3">
+            {profile.avatar_url && (
+              <img
+                src={profile.avatar_url}
+                alt=""
+                className="w-9 h-9 rounded-full border border-paperLine"
+              />
+            )}
+            <div className="text-right text-sm">
+              <p className="font-medium">{profile.full_name ?? profile.email}</p>
+              <p className="text-xs text-inkSoft uppercase tracking-wide">
+                {ROLE_LABELS[profile.role] ?? profile.role}
+              </p>
+              <button
+                onClick={() => supabase.auth.signOut()}
+                className="text-xs underline text-inkSoft hover:text-ink"
+              >
+                Sign out
+              </button>
+            </div>
           </div>
         </div>
         <nav className="max-w-4xl mx-auto px-4 flex gap-6 overflow-x-auto">
