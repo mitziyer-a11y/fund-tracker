@@ -95,7 +95,7 @@ export default function PeoplePanel({ currentProfileId }) {
           <select
             value={newRole}
             onChange={(e) => setNewRole(e.target.value)}
-            className="border border-paperLine rounded px-3 py-2 bg-white text-sm"
+            className="border border-paperLine rounded px-3 py-2 bg-card text-sm"
           >
             {ROLES.map((r) => (
               <option key={r} value={r}>{r}</option>
@@ -120,7 +120,7 @@ export default function PeoplePanel({ currentProfileId }) {
                     value={a.role}
                     disabled={busy === a.email}
                     onChange={(e) => updateAllowedRole(a.email, e.target.value)}
-                    className="border border-paperLine rounded px-2 py-1 bg-white text-xs"
+                    className="border border-paperLine rounded px-2 py-1 bg-card text-xs"
                   >
                     {ROLES.map((r) => (
                       <option key={r} value={r}>{r}</option>
@@ -179,7 +179,7 @@ export default function PeoplePanel({ currentProfileId }) {
                           value={p.role}
                           disabled={busy === p.id || p.id === currentProfileId}
                           onChange={(e) => updateProfile(p.id, { role: e.target.value }, p.email)}
-                          className="border border-paperLine rounded px-2 py-1 bg-white text-xs"
+                          className="border border-paperLine rounded px-2 py-1 bg-card text-xs"
                           title={p.id === currentProfileId ? "You can't change your own role" : undefined}
                         >
                           {ROLES.map((r) => (
@@ -190,7 +190,7 @@ export default function PeoplePanel({ currentProfileId }) {
                           value={p.status}
                           disabled={busy === p.id || p.id === currentProfileId}
                           onChange={(e) => updateProfile(p.id, { status: e.target.value })}
-                          className={`border rounded px-2 py-1 bg-white text-xs ${
+                          className={`border rounded px-2 py-1 bg-card text-xs ${
                             p.status === 'disabled' ? 'border-stampRed text-stampRed'
                             : p.status === 'pending' ? 'border-stampAmber text-stampAmber'
                             : 'border-stampGreen text-stampGreen'
@@ -208,7 +208,7 @@ export default function PeoplePanel({ currentProfileId }) {
                           value={p.role}
                           disabled={busy === p.email}
                           onChange={(e) => updateAllowedRole(p.email, e.target.value)}
-                          className="border border-paperLine rounded px-2 py-1 bg-white text-xs"
+                          className="border border-paperLine rounded px-2 py-1 bg-card text-xs"
                         >
                           {ROLES.map((r) => (
                             <option key={r} value={r}>{r}</option>
