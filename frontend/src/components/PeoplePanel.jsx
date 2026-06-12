@@ -45,6 +45,29 @@ export default function PeoplePanel({ currentProfileId }) {
 
   const removeAllowed = async (email) => {
     setBusy(email)
+    setError(null)
+
+    // If this email already has a profile (i.e. they've signed in), removing
+    // them from the allowlist should actually revoke their access too —
+    // otherwise "Remove" looks like it does nothing for active users.
+    const match = profiles.find((p) => p.email.toLowerCase() === email.toLowerCase())
+    if (match) {
+      if (match.id === currentProfileId) {
+        setBusy(null)
+        setError("You can't remove/disable your own account.")
+        return
+      }
+      const { error: profErr } = await supabase
+        .from('profiles')
+        .update({ status: 'disabled' })
+        .eq('id', match.id)
+      if (profErr) {
+        setBusy(null)
+        setError(profErr.message)
+        return
+      }
+    }
+
     const { error } = await supabase.from('allowed_emails').delete().eq('email', email)
     setBusy(null)
     if (error) setError(error.message)
@@ -83,6 +106,8 @@ export default function PeoplePanel({ currentProfileId }) {
           Anyone signing in with one of these emails is approved automatically
           and starts with the role you pick here. Everyone else lands on an
           "awaiting approval" screen until you approve them in People below.
+          "Remove" here also disables that person's access if they've already
+          signed in (they'll see "Access disabled" and be blocked immediately).
         </p>
         <form onSubmit={addAllowed} className="flex gap-2 mb-4">
           <input
