@@ -45,32 +45,43 @@ export default function PeoplePanel({ currentProfileId }) {
 
   const removeAllowed = async (email) => {
     setBusy(email)
-    setError(null)
-
-    // If this email already has a profile (i.e. they've signed in), removing
-    // them from the allowlist should actually revoke their access too —
-    // otherwise "Remove" looks like it does nothing for active users.
-    const match = profiles.find((p) => p.email.toLowerCase() === email.toLowerCase())
-    if (match) {
-      if (match.id === currentProfileId) {
-        setBusy(null)
-        setError("You can't remove/disable your own account.")
-        return
-      }
-      const { error: profErr } = await supabase
-        .from('profiles')
-        .update({ status: 'disabled' })
-        .eq('id', match.id)
-      if (profErr) {
-        setBusy(null)
-        setError(profErr.message)
-        return
-      }
-    }
-
     const { error } = await supabase.from('allowed_emails').delete().eq('email', email)
     setBusy(null)
     if (error) setError(error.message)
+    await load()
+  }
+
+  // Remove a person entirely. If they have request history, a hard delete
+  // would violate a foreign key — fall back to disabling instead, and say so.
+  const removeProfile = async (p) => {
+    if (p.id === currentProfileId) {
+      setError("You can't remove your own account.")
+      return
+    }
+    setBusy(p.id)
+    setError(null)
+
+    const { error: delErr } = await supabase.from('profiles').delete().eq('id', p.id)
+    if (delErr) {
+      // Likely a foreign key violation (they have requests on file) —
+      // disable instead, so access is revoked even if the record stays.
+      const { error: disErr } = await supabase
+        .from('profiles')
+        .update({ status: 'disabled' })
+        .eq('id', p.id)
+      setBusy(null)
+      if (disErr) {
+        setError(disErr.message)
+      } else {
+        setError(`${p.email} has existing requests on file, so they were disabled instead of removed.`)
+      }
+      await load()
+      return
+    }
+
+    // Also drop any allowlist entry so they can't auto-reactivate
+    await supabase.from('allowed_emails').delete().eq('email', p.email)
+    setBusy(null)
     await load()
   }
 
@@ -104,10 +115,9 @@ export default function PeoplePanel({ currentProfileId }) {
         <h2 className="font-display text-2xl mb-1">Auto-approve list</h2>
         <p className="text-sm text-inkSoft mb-4">
           Anyone signing in with one of these emails is approved automatically
-          and starts with the role you pick here. Everyone else lands on an
-          "awaiting approval" screen until you approve them in People below.
-          "Remove" here also disables that person's access if they've already
-          signed in (they'll see "Access disabled" and be blocked immediately).
+          and starts with the role you pick here. Everyone else lands on a
+          "your access is pending approval" screen until you approve them in
+          People below.
         </p>
         <form onSubmit={addAllowed} className="flex gap-2 mb-4">
           <input
@@ -226,6 +236,14 @@ export default function PeoplePanel({ currentProfileId }) {
                             <option key={s} value={s}>{s}</option>
                           ))}
                         </select>
+                        <button
+                          onClick={() => removeProfile(p)}
+                          disabled={busy === p.id || p.id === currentProfileId}
+                          className="text-xs underline text-inkSoft hover:text-stampRed"
+                          title={p.id === currentProfileId ? "You can't remove your own account" : undefined}
+                        >
+                          Remove
+                        </button>
                       </>
                     ) : (
                       <>
