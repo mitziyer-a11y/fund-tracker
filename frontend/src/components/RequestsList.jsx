@@ -12,11 +12,14 @@ const CATEGORIES = [
   'Other',
 ]
 
+const CURRENCIES = ['SGD', 'USD', 'EUR', 'GBP', 'AUD', 'JPY', 'INR', 'MYR', 'HKD', 'CNY']
+
 export default function RequestsList({ profile, isReviewer, refreshKey }) {
   const [requests, setRequests] = useState([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState(null)
   const [editAmount, setEditAmount] = useState('')
+  const [editCurrency, setEditCurrency] = useState('SGD')
   const [editCategory, setEditCategory] = useState('')
   const [editDetails, setEditDetails] = useState('')
   const [savingId, setSavingId] = useState(null)
@@ -24,9 +27,11 @@ export default function RequestsList({ profile, isReviewer, refreshKey }) {
 
   const load = async () => {
     setLoading(true)
+    // Explicit FK name (requests_user_id_fkey) needed since `requests` has
+    // two relationships to `profiles` (user_id and reviewer_id).
     const { data, error } = await supabase
       .from('requests')
-      .select('*, profiles(full_name, email)')
+      .select('*, profiles!requests_user_id_fkey(full_name, email)')
       .order('created_at', { ascending: false })
     if (error) setError(error.message)
     setRequests(data ?? [])
@@ -40,6 +45,7 @@ export default function RequestsList({ profile, isReviewer, refreshKey }) {
   const startEdit = (r) => {
     setEditingId(r.id)
     setEditAmount(r.amount)
+    setEditCurrency(r.currency ?? 'SGD')
     setEditCategory(r.category)
     setEditDetails(r.details)
   }
@@ -52,6 +58,7 @@ export default function RequestsList({ profile, isReviewer, refreshKey }) {
       .from('requests')
       .update({
         amount: Number(editAmount),
+        currency: editCurrency,
         category: editCategory,
         details: editDetails.trim(),
         status: 'pending',
@@ -89,7 +96,7 @@ export default function RequestsList({ profile, isReviewer, refreshKey }) {
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
                   <p className="font-mono text-lg font-semibold">
-                    ${Number(r.amount).toLocaleString()}
+                    {r.currency ?? 'SGD'} {Number(r.amount).toLocaleString()}
                   </p>
                   <p className="text-sm text-inkSoft">
                     {r.category} · requested by{' '}
@@ -123,16 +130,30 @@ export default function RequestsList({ profile, isReviewer, refreshKey }) {
 
               {isEditing && (
                 <div className="mt-3 space-y-3 border-t border-paperLine pt-3">
-                  <div>
-                    <label className="block text-xs font-medium mb-1">Amount (USD)</label>
-                    <input
-                      type="number"
-                      min="0.01"
-                      step="0.01"
-                      value={editAmount}
-                      onChange={(e) => setEditAmount(e.target.value)}
-                      className="w-full border border-paperLine rounded px-3 py-2 font-mono"
-                    />
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium mb-1">Amount</label>
+                      <input
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        value={editAmount}
+                        onChange={(e) => setEditAmount(e.target.value)}
+                        className="w-full border border-paperLine rounded px-3 py-2 font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium mb-1">Currency</label>
+                      <select
+                        value={editCurrency}
+                        onChange={(e) => setEditCurrency(e.target.value)}
+                        className="border border-paperLine rounded px-3 py-2 bg-white"
+                      >
+                        {CURRENCIES.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-medium mb-1">Category</label>
